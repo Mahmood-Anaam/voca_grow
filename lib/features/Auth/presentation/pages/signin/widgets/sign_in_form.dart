@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
-import '../../widgets/auth_form_field.dart';
-import '../../widgets/auth_submit_button.dart';
+import '../../../widgets/auth_form_field.dart';
+import '../../../widgets/auth_submit_button.dart';
 
-class SignUpForm extends StatefulWidget {
-  final Function(String email, String password, String name)? onSignUp;
-  final VoidCallback? onSignInTap;
+class SignInForm extends StatefulWidget {
+  final Function(String email, String password)? onSignIn;
+  final Function()? onSignUpTap;
+  final Function()? onForgotPasswordTap;
 
-  const SignUpForm({super.key, this.onSignUp, this.onSignInTap});
+  const SignInForm({
+    super.key,
+    this.onSignIn,
+    this.onSignUpTap,
+    this.onForgotPasswordTap,
+  });
 
   @override
-  State<SignUpForm> createState() => _SignUpFormState();
+  State<SignInForm> createState() => _SignInFormState();
 }
 
-class _SignUpFormState extends State<SignUpForm> {
+class _SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -39,19 +40,6 @@ class _SignUpFormState extends State<SignUpForm> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            AuthFormField(
-              controller: _nameController,
-              hintText: 'Full Name',
-              labelText: 'Full Name',
-              prefixIcon: Icons.person_outline,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your name';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
             AuthFormField(
               controller: _emailController,
               hintText: 'Email',
@@ -95,48 +83,23 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
-            AuthFormField(
-              controller: _confirmPasswordController,
-              hintText: 'Confirm Password',
-              labelText: 'Confirm Password',
-              prefixIcon: Icons.lock_outline,
-              obscureText: _obscureConfirmPassword,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureConfirmPassword
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  setState(
-                    () => _obscureConfirmPassword = !_obscureConfirmPassword,
-                  );
-                },
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please confirm your password';
-                }
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
+            SizedBox(height: 10),
+            TextButton(
+              onPressed: widget.onForgotPasswordTap,
+              child: Text('Forgot Password?'),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
             AuthSubmitButton(
-              text: 'Sign Up',
+              text: 'Sign In',
               isLoading: _isLoading,
+
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   setState(() => _isLoading = true);
                   try {
-                    await widget.onSignUp?.call(
+                    await widget.onSignIn?.call(
                       _emailController.text,
                       _passwordController.text,
-                      _nameController.text,
                     );
                   } finally {
                     setState(() => _isLoading = false);
@@ -144,26 +107,27 @@ class _SignUpFormState extends State<SignUpForm> {
                 }
               },
             ),
-            const SizedBox(height: 24),
-            // Sign In Link
+
+            SizedBox(height: 10),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Already have an account?',
+                  'Don\'t have an account? ',
                   style: Theme.of(
                     context,
                   ).textTheme.titleSmall?.copyWith(color: Colors.grey.shade600),
                 ),
                 TextButton(
-                  onPressed: widget.onSignInTap,
+                  onPressed: widget.onSignUpTap,
                   style: Theme.of(context).textButtonTheme.style?.copyWith(
                     padding: WidgetStateProperty.all(
                       EdgeInsets.symmetric(horizontal: 0),
                     ),
                   ),
                   child: Text(
-                    'Sign In',
+                    'Sign Up',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).textTheme.titleLarge?.color,

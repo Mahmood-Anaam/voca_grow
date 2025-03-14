@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/router/routes.dart';
 import '../../../../../core/utils/assets.dart';
 import '../../widgets/auth_header.dart';
-import 'sign_up_form.dart';
+import 'widgets/sign_up_form.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});

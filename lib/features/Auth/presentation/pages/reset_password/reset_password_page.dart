@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/router/routes.dart';
 import '../../../../../core/utils/assets.dart';
 import '../../widgets/auth_header.dart';
-import 'reset_password_form.dart';
+import 'widgets/reset_password_form.dart';
 
 class ResetPasswordPage extends StatelessWidget {
   const ResetPasswordPage({super.key});

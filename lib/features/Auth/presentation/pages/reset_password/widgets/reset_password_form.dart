@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../widgets/auth_form_field.dart';
-import '../../widgets/auth_submit_button.dart';
+import '../../../widgets/auth_form_field.dart';
+import '../../../widgets/auth_submit_button.dart';
 
 class ResetPasswordForm extends StatefulWidget {
   final Function(String email)? onResetPassword;
