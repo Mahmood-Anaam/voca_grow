@@ -1,26 +1,47 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../data/repositories/auth_repository.dart';
-import '../data/models/user_model.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository authRepository;
+  final AuthRepository authRepository = AuthRepository();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  StreamSubscription<User?>? _authSubscription;
 
-  AuthBloc(this.authRepository) : super(AuthInitial()) {
+  AuthBloc() : super(AuthLoading()) {
+    // Listen to auth state changes
+    _authSubscription = _firebaseAuth.authStateChanges().listen((user) {
+      if (user != null) {
+        // User is signed in
+        add(UserLoggedIn(user));
+      } else {
+        // User is signed out
+        add(UserLoggedOut());
+      }
+    });
+
     on<SignInEvent>(_onSignIn);
     on<SignUpEvent>(_onSignUp);
     on<ResetPasswordEvent>(_onResetPassword);
     on<SignOutEvent>(_onSignOut);
+    on<UserLoggedIn>(_onUserLoggedIn);
+    on<UserLoggedOut>(_onUserLoggedOut);
   }
 
   Future<void> _onSignIn(SignInEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       final user = await authRepository.signIn(event.email, event.password);
-      emit(AuthSuccess(user));
+      if (user != null) {
+        emit(AuthSuccess(user));
+      } else {
+        emit(AuthFailure('User not found'));
+      }
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
@@ -34,7 +55,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.password,
         event.name,
       );
-      emit(AuthSuccess(user));
+      if (user != null) {
+        emit(AuthSuccess(user));
+      } else {
+        emit(AuthFailure('Failed to sign up'));
+      }
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
@@ -57,9 +82,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await authRepository.signOut();
-      emit(AuthSuccess(null));
+      emit(AuthInitial());
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
+  }
+
+  Future<void> _onUserLoggedIn(
+    UserLoggedIn event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final user = authRepository.getCurrentUser();
+      if (user != null) {
+        emit(AuthSuccess(user));
+      } else {
+        emit(AuthFailure('User not found'));
+      }
+    } catch (e) {
+      emit(AuthFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onUserLoggedOut(
+    UserLoggedOut event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthInitial());
+  }
+
+  @override
+  Future<void> close() {
+    _authSubscription
+        ?.cancel(); // Cancel the subscription when the bloc is closed
+    return super.close();
   }
 }

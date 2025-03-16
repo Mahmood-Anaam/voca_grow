@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../../core/router/routes.dart';
+import '../../../../bloc/auth_bloc.dart';
 import '../../../widgets/auth_form_field.dart';
 import '../../../widgets/auth_submit_button.dart';
 
@@ -20,9 +24,10 @@ class SignInForm extends StatefulWidget {
 
 class _SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
+  final _emailController = TextEditingController(
+    text: "eng.mahmood.anaam@gmail.com",
+  );
+  final _passwordController = TextEditingController(text: "123456789");
   bool _obscurePassword = true;
 
   @override
@@ -89,22 +94,32 @@ class _SignInFormState extends State<SignInForm> {
               child: Text('Forgot Password?'),
             ),
             const SizedBox(height: 10),
-            AuthSubmitButton(
-              text: 'Sign In',
-              isLoading: _isLoading,
-
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  setState(() => _isLoading = true);
-                  try {
-                    await widget.onSignIn?.call(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
-                  } finally {
-                    setState(() => _isLoading = false);
-                  }
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthSuccess) {
+                  context.pushReplacementNamed(AppRoute.home.name);
+                } else if (state is AuthFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
                 }
+              },
+              builder: (context, state) {
+                return AuthSubmitButton(
+                  text: 'Sign In',
+                  isLoading: state is AuthLoading,
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await widget.onSignIn?.call(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+                    }
+                  },
+                );
               },
             ),
 
