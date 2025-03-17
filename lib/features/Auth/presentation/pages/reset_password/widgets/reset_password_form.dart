@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../../core/router/routes.dart';
+import '../../../../bloc/auth_bloc.dart';
 import '../../../widgets/auth_form_field.dart';
 import '../../../widgets/auth_submit_button.dart';
 
@@ -14,7 +18,6 @@ class ResetPasswordForm extends StatefulWidget {
 class _ResetPasswordFormState extends State<ResetPasswordForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -48,18 +51,29 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
               },
             ),
             const SizedBox(height: 30),
-            AuthSubmitButton(
-              text: 'Send Reset Link',
-              isLoading: _isLoading,
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  setState(() => _isLoading = true);
-                  try {
-                    await widget.onResetPassword?.call(_emailController.text);
-                  } finally {
-                    setState(() => _isLoading = false);
-                  }
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthSuccess) {
+                  context.pushReplacementNamed(AppRoute.signin.name);
+                } else if (state is AuthFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
                 }
+              },
+              builder: (context, state) {
+                return AuthSubmitButton(
+                  text: 'Send Reset Link',
+                  isLoading: state is AuthLoading,
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await widget.onResetPassword?.call(_emailController.text);
+                    }
+                  },
+                );
               },
             ),
             const SizedBox(height: 20),

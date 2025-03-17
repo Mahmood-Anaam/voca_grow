@@ -10,7 +10,7 @@ import '../../features/splash/presentation/splash_psge.dart';
 import 'routes.dart';
 
 final router = GoRouter(
-  initialLocation: '/managechildren',
+  initialLocation: '/splash',
   routes: [
     GoRoute(
       path: '/splash',

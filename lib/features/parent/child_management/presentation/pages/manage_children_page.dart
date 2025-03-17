@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/router/routes.dart';
 import '../../../../../core/utils/assets.dart';
 import '../../../../../core/utils/size_config.dart';
+import '../../../../Auth/data/repositories/auth_repository.dart';
 import '../../bloc/child_bloc.dart';
 
 class ManageChildrenPage extends StatelessWidget {
@@ -11,6 +12,11 @@ class ManageChildrenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user =
+        RepositoryProvider.of<AuthRepository>(
+          context,
+          listen: false,
+        ).getCurrentUser();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manage Children'),
@@ -18,10 +24,7 @@ class ManageChildrenPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              context.pushNamed(
-                AppRoute.childinfo.name,
-                extra: null,
-                );
+              context.pushNamed(AppRoute.childinfo.name, extra: null);
             },
           ),
         ],
@@ -54,14 +57,16 @@ class ManageChildrenPage extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.edit),
                           onPressed: () {
-                            context.pushNamed( AppRoute.childinfo.name, extra: child);
+                            context.read<ChildBloc>().add(
+                              DeleteChildEvent(child.id, user!.uid),
+                            );
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
                             context.read<ChildBloc>().add(
-                              DeleteChildEvent(child.id, 'parentId'),
+                              DeleteChildEvent(child.id, user!.uid),
                             );
                           },
                         ),

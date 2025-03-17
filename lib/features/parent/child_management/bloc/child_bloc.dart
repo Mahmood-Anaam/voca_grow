@@ -9,7 +9,7 @@ part 'child_state.dart';
 class ChildBloc extends Bloc<ChildEvent, ChildState> {
   final ChildRepository childRepository;
 
-  ChildBloc(this.childRepository) : super(ChildInitial()) {
+  ChildBloc({required this.childRepository}) : super(ChildInitial()) {
     on<AddChildEvent>(_onAddChild);
     on<UpdateChildEvent>(_onUpdateChild);
     on<DeleteChildEvent>(_onDeleteChild);

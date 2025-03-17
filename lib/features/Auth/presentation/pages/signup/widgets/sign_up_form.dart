@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../../core/router/routes.dart';
+import '../../../../bloc/auth_bloc.dart';
 import '../../../widgets/auth_form_field.dart';
 import '../../../widgets/auth_submit_button.dart';
 
@@ -18,7 +22,6 @@ class _SignUpFormState extends State<SignUpForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -126,22 +129,33 @@ class _SignUpFormState extends State<SignUpForm> {
               },
             ),
             const SizedBox(height: 30),
-            AuthSubmitButton(
-              text: 'Sign Up',
-              isLoading: _isLoading,
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  setState(() => _isLoading = true);
-                  try {
-                    await widget.onSignUp?.call(
-                      _emailController.text,
-                      _passwordController.text,
-                      _nameController.text,
-                    );
-                  } finally {
-                    setState(() => _isLoading = false);
-                  }
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthSuccess) {
+                  context.pushReplacementNamed(AppRoute.signin.name);
+                } else if (state is AuthFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
                 }
+              },
+              builder: (context, state) {
+                return AuthSubmitButton(
+                  text: 'Sign Up',
+                  isLoading: state is AuthLoading,
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await widget.onSignUp?.call(
+                        _emailController.text,
+                        _passwordController.text,
+                        _nameController.text,
+                      );
+                    }
+                  },
+                );
               },
             ),
             const SizedBox(height: 24),

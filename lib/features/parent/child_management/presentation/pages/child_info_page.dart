@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../../core/utils/assets.dart';
 import '../../../../../core/utils/size_config.dart';
 import '../../../../../core/widgets/space_widget.dart';
+import '../../../../Auth/data/repositories/auth_repository.dart';
 import '../../bloc/child_bloc.dart';
 import '../../data/models/child_model.dart';
 
@@ -13,6 +15,12 @@ class ChildInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user =
+        RepositoryProvider.of<AuthRepository>(
+          context,
+          listen: false,
+        ).getCurrentUser();
+
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController(text: child?.name ?? '');
     final ageController = TextEditingController(
@@ -100,14 +108,14 @@ class ChildInfoPage extends StatelessWidget {
                     );
                     if (child == null) {
                       context.read<ChildBloc>().add(
-                        AddChildEvent(newChild, 'parentId'),
+                        AddChildEvent(newChild, user!.uid),
                       );
                     } else {
                       context.read<ChildBloc>().add(
-                        UpdateChildEvent(newChild, 'parentId'),
+                        UpdateChildEvent(newChild, user!.uid),
                       );
                     }
-                    Navigator.pop(context);
+                    context.pop();
                   }
                 },
                 child: Text(child == null ? 'Add Child' : 'Update Child'),

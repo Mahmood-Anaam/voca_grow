@@ -65,7 +65,7 @@ class SigninPage extends StatelessWidget {
                           child: SignInForm(
                             onSignIn: (email, password) async {
                               context.read<AuthBloc>().add(
-                                SignInEvent(email, password),
+                                SignInEvent(email: email, password: password),
                               );
                             },
                             onSignUpTap: () {

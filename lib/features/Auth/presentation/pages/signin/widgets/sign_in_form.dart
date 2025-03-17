@@ -96,7 +96,7 @@ class _SignInFormState extends State<SignInForm> {
             const SizedBox(height: 10),
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
-                if (state is AuthSuccess) {
+                if (state is Authenticated) {
                   context.pushReplacementNamed(AppRoute.home.name);
                 } else if (state is AuthFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(

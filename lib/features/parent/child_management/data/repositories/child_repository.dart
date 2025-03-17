@@ -4,6 +4,7 @@ import '../models/child_model.dart';
 class ChildRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+
   // Add a new child
   Future<void> addChild(Child child, String parentId) async {
     await _firestore
