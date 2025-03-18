@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:voca_grow/features/Auth/data/models/models.dart';
 import '../../../../bloc/auth_bloc.dart';
+import '../../../../data/models/user_model.dart';
 import '../../../widgets/auth_form_field.dart';
 import '../../../widgets/auth_submit_button.dart';
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../data/repositories/auth_repository.dart';
-import '../data/models/models.dart';
+import '../data/models/user_model.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 

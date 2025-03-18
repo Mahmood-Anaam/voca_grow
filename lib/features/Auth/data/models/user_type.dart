@@ -1,7 +1,8 @@
-enum UserType { parent, child , none}
+part of 'user_model.dart';
+
+enum UserType { parent, child, none }
 
 extension UserTypeParser on String {
-  
   UserType toUserType() {
     switch (this) {
       case 'parent':
@@ -10,7 +11,7 @@ extension UserTypeParser on String {
         return UserType.child;
       case 'none':
         return UserType.none;
-      
+
       default:
         throw ArgumentError('Invalid user type: $this');
     }

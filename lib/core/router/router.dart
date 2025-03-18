@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:voca_grow/features/Auth/bloc/auth_bloc.dart';
-import '../../features/Auth/data/models/models.dart';
+import '../../features/Auth/data/models/user_model.dart';
 import '../../features/Auth/presentation/pages/reset_password/reset_password_page.dart';
 import '../../features/Auth/presentation/pages/signin/signin_page.dart';
 import '../../features/Auth/presentation/pages/signup/signup_page.dart';

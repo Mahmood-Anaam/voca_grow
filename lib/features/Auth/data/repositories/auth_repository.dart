@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/models.dart';
+import '../models/user_model.dart';
 import 'auth_exceptions.dart';
 
 class AuthRepository {
