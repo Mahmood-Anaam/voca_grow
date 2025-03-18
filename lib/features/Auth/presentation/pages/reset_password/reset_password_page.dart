@@ -69,7 +69,7 @@ class ResetPasswordPage extends StatelessWidget {
                             },
                             onResetPassword: (email) async {
                               context.read<AuthBloc>().add(
-                                ResetPasswordEvent(email: email),
+                                ResetPasswordRequested(email: email),
                               );
                             },
                           ),

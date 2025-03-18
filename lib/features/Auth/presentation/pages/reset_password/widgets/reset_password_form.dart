@@ -58,7 +58,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                 } else if (state is AuthFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message),
+                      content: Text(state.error),
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                   );

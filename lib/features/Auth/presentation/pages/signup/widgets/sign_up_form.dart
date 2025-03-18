@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../../../core/router/routes.dart';
+import 'package:voca_grow/features/Auth/data/models/models.dart';
 import '../../../../bloc/auth_bloc.dart';
 import '../../../widgets/auth_form_field.dart';
 import '../../../widgets/auth_submit_button.dart';
 
 class SignUpForm extends StatefulWidget {
-  final Function(String email, String password, String name)? onSignUp;
+  final Function(UserType userType, String email, String password, String name)?
+  onSignUp;
   final VoidCallback? onSignInTap;
 
   const SignUpForm({super.key, this.onSignUp, this.onSignInTap});
@@ -24,6 +24,7 @@ class _SignUpFormState extends State<SignUpForm> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  UserType _userType = UserType.parent;
 
   @override
   void dispose() {
@@ -42,6 +43,28 @@ class _SignUpFormState extends State<SignUpForm> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
+            // dropdown usertype
+            DropdownButtonFormField<UserType>(
+              value: _userType,
+              icon: Icon(Icons.merge_type),
+
+              items: const [
+                DropdownMenuItem<UserType>(
+                  value: UserType.parent,
+                  child: Text('Parent'),
+                ),
+                DropdownMenuItem<UserType>(
+                  value: UserType.child,
+                  child: Text('Child'),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _userType = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 15),
             AuthFormField(
               controller: _nameController,
               hintText: 'Full Name',
@@ -54,7 +77,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             AuthFormField(
               controller: _emailController,
               hintText: 'Email',
@@ -72,7 +95,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             AuthFormField(
               controller: _passwordController,
               hintText: 'Password',
@@ -98,7 +121,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             AuthFormField(
               controller: _confirmPasswordController,
               hintText: 'Confirm Password',
@@ -128,15 +151,13 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 15),
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
-                if (state is AuthSuccess) {
-                  context.pushReplacementNamed(AppRoute.signin.name);
-                } else if (state is AuthFailure) {
+                if (state is AuthFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message),
+                      content: Text(state.error),
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                   );
@@ -149,6 +170,7 @@ class _SignUpFormState extends State<SignUpForm> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       await widget.onSignUp?.call(
+                        _userType,
                         _emailController.text,
                         _passwordController.text,
                         _nameController.text,
@@ -158,7 +180,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 );
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 14),
             // Sign In Link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -3,7 +3,8 @@ enum AppRoute {
   signin,
   signup,
   resetpassword,
-  home,
-  managechildren,
-  childinfo, 
+  parenthome,
+  childhome,
+  // managechildren,
+  // childinfo, 
   }

@@ -10,11 +10,21 @@ import 'features/Auth/data/repositories/auth_repository.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
- 
   WidgetsFlutterBinding.ensureInitialized();
-   Bloc.observer = AppBlocObserver();
+  Bloc.observer = AppBlocObserver();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const VocaGrowApp());
+  runApp(
+    RepositoryProvider(
+      create: (context) => AuthRepository(),
+      child: BlocProvider(
+        lazy: false,
+        create:
+            (context) =>
+                AuthBloc(authRepository: context.read<AuthRepository>()),
+        child: const VocaGrowApp(),
+      ),
+    ),
+  );
 }
 
 class VocaGrowApp extends StatelessWidget {
@@ -24,26 +34,11 @@ class VocaGrowApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return RepositoryProvider<AuthRepository>(
-      create: (context) => AuthRepository(),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthBloc>(
-            create:
-                (context) => AuthBloc(
-                  authRepository: RepositoryProvider.of<AuthRepository>(
-                    context,
-                  ),
-                ),
-          ),
-        ],
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'Voca Grow App',
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
-      ),
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'Voca Grow App',
+      theme: AppTheme.lightTheme,
+      routerConfig: appRouter(context.read<AuthBloc>()),
     );
   }
 }

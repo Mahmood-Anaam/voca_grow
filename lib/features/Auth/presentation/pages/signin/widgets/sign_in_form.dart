@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../../../core/router/routes.dart';
 import '../../../../bloc/auth_bloc.dart';
 import '../../../widgets/auth_form_field.dart';
 import '../../../widgets/auth_submit_button.dart';
@@ -27,7 +25,7 @@ class _SignInFormState extends State<SignInForm> {
   final _emailController = TextEditingController(
     text: "eng.mahmood.anaam@gmail.com",
   );
-  final _passwordController = TextEditingController(text: "123456789");
+  final _passwordController = TextEditingController(text: "12345678");
   bool _obscurePassword = true;
 
   @override
@@ -96,12 +94,10 @@ class _SignInFormState extends State<SignInForm> {
             const SizedBox(height: 10),
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
-                if (state is Authenticated) {
-                  context.pushReplacementNamed(AppRoute.home.name);
-                } else if (state is AuthFailure) {
+                if (state is AuthFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message),
+                      content: Text(state.error),
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                   );

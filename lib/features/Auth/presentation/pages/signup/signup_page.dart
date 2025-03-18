@@ -42,7 +42,7 @@ class SignUpPage extends StatelessWidget {
                           logo: Image.asset(
                             Assets.imagesHappyMic,
                             width: 100,
-                            height: 100,
+                            height: 90,
                           ),
                         ),
 
@@ -68,12 +68,13 @@ class SignUpPage extends StatelessWidget {
                                 AppRoute.signin.name,
                               );
                             },
-                            onSignUp: (email, password, name) async {
+                            onSignUp: (userType, email, password, name) async {
                               context.read<AuthBloc>().add(
-                                SignUpEvent(
+                                SignUpRequested(
                                   email: email,
                                   password: password,
                                   name: name,
+                                  userType: userType,
                                 ),
                               );
                             },

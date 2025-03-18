@@ -1,55 +1,79 @@
 import 'package:go_router/go_router.dart';
+import 'package:voca_grow/features/Auth/bloc/auth_bloc.dart';
+import '../../features/Auth/data/models/models.dart';
 import '../../features/Auth/presentation/pages/reset_password/reset_password_page.dart';
 import '../../features/Auth/presentation/pages/signin/signin_page.dart';
 import '../../features/Auth/presentation/pages/signup/signup_page.dart';
-import '../../features/home/presentation/pages/home_psge.dart';
-import '../../features/parent/child_management/data/models/child_model.dart';
-import '../../features/parent/child_management/presentation/pages/child_info_page.dart';
-import '../../features/parent/child_management/presentation/pages/manage_children_page.dart';
 import '../../features/splash/presentation/splash_psge.dart';
+import '../../features/parent/home/presentation/pages/home_page.dart'
+    as parent_home;
+import '../../features/child/home/presentation/pages/home_page.dart'
+    as child_home;
 import 'routes.dart';
 
-final router = GoRouter(
-  initialLocation: '/splash',
+GoRouter appRouter(AuthBloc bloc) => GoRouter(
+  initialLocation: '/${AppRoute.splash.name}',
+  refreshListenable: bloc,
   routes: [
     GoRoute(
-      path: '/splash',
+      path: '/${AppRoute.splash.name}',
       name: AppRoute.splash.name,
       builder: (context, state) => const SplashPsge(),
     ),
-
     GoRoute(
-      path: '/signin',
+      path: '/${AppRoute.signin.name}',
       name: AppRoute.signin.name,
       builder: (context, state) => const SigninPage(),
     ),
     GoRoute(
-      path: '/signup',
+      path: '/${AppRoute.signup.name}',
       name: AppRoute.signup.name,
       builder: (context, state) => const SignUpPage(),
     ),
     GoRoute(
-      path: '/resetpassword',
+      path: '/${AppRoute.resetpassword.name}',
       name: AppRoute.resetpassword.name,
       builder: (context, state) => const ResetPasswordPage(),
     ),
-
     GoRoute(
-      path: '/',
-      name: AppRoute.home.name,
-      builder: (context, state) => const HomePsge(),
+      path: '/${AppRoute.parenthome.name}',
+      name: AppRoute.parenthome.name,
+      builder: (context, state) => const parent_home.HomePage(),
     ),
-
     GoRoute(
-      path: '/childinfo',
-      name: AppRoute.childinfo.name,
-      builder: (context, state) => ChildInfoPage(child: state.extra!=null ? state.extra as Child:null)
-    ),
-
-    GoRoute(
-      path: '/managechildren',
-      name: AppRoute.managechildren.name,
-      builder: (context, state) => const ManageChildrenPage(),
+      path: '/${AppRoute.childhome.name}',
+      name: AppRoute.childhome.name,
+      builder: (context, state) => const child_home.HomePage(),
     ),
   ],
+
+  redirect: (context, state) {
+    final authState = bloc.state;
+    final restrictedPaths = {
+      "/${AppRoute.signin.name}",
+      "/${AppRoute.signup.name}",
+      "/${AppRoute.resetpassword.name}",
+    };
+
+    if (authState is AuthInitial &&
+        state.fullPath != "/${AppRoute.signin.name}" &&
+        state.fullPath != "/${AppRoute.signup.name}") {
+      return '/${AppRoute.splash.name}';
+    }
+
+    if (authState is Unauthenticated &&
+        !restrictedPaths.contains(state.fullPath)) {
+      return '/${AppRoute.signin.name}';
+    }
+
+    if (authState is Authenticated &&
+        (state.fullPath == "/${AppRoute.signin.name}" ||
+            state.fullPath == "/${AppRoute.signup.name}")) {
+      return authState.user.userType == UserType.parent
+          ? '/${AppRoute.parenthome.name}'
+          : '/${AppRoute.childhome.name}';
+    }
+
+    return null;
+  },
 );
