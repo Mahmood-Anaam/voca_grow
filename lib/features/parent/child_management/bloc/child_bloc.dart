@@ -2,69 +2,66 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../data/repositories/child_repository.dart';
 import '../data/models/child_model.dart';
-
 part 'child_event.dart';
 part 'child_state.dart';
 
 class ChildBloc extends Bloc<ChildEvent, ChildState> {
-  final ChildRepository childRepository;
+  final ChildRepository repository;
 
-  ChildBloc({required this.childRepository}) : super(ChildInitial()) {
-    on<AddChildEvent>(_onAddChild);
-    on<UpdateChildEvent>(_onUpdateChild);
-    on<DeleteChildEvent>(_onDeleteChild);
-    on<LoadChildrenEvent>(_onLoadChildren);
+  ChildBloc({required this.repository}) : super(ChildInitial()) {
+    on<FetchChildren>(_onFetchChildren);
+    on<AddChild>(_onAddChild);
+    on<UpdateChild>(_onUpdateChild);
+    on<DeleteChild>(_onDeleteChild);
   }
 
-  Future<void> _onAddChild(
-    AddChildEvent event,
-    Emitter<ChildState> emit,
-  ) async {
-    emit(ChildLoading());
+  void _onFetchChildren(FetchChildren event, Emitter<ChildState> emit) async {
     try {
-      await childRepository.addChild(event.child, event.parentId);
-      emit(ChildLoaded(await childRepository.getChildren(event.parentId)));
+      emit(ChildLoading());
+      final children = await repository.fetchChildren();
+      emit(ChildrenLoaded(children));
     } catch (e) {
-      emit(ChildError(e.toString()));
+      emit(ChildError('Failed to fetch children'));
     }
   }
 
-  Future<void> _onUpdateChild(
-    UpdateChildEvent event,
-    Emitter<ChildState> emit,
-  ) async {
-    emit(ChildLoading());
+  void _onAddChild(AddChild event, Emitter<ChildState> emit) async {
     try {
-      await childRepository.updateChild(event.child, event.parentId);
-      emit(ChildLoaded(await childRepository.getChildren(event.parentId)));
+      final child = await repository.addChild(event.child);
+      emit(ChildAdded(child));
+      emit(ChildLoading());
+
+      // Após adicionar, buscar lista atualizada
+      final children = await repository.fetchChildren();
+      emit(ChildrenLoaded(children));
     } catch (e) {
-      emit(ChildError(e.toString()));
+      emit(ChildError('Failed to add child'));
     }
   }
 
-  Future<void> _onDeleteChild(
-    DeleteChildEvent event,
-    Emitter<ChildState> emit,
-  ) async {
-    emit(ChildLoading());
+  void _onUpdateChild(UpdateChild event, Emitter<ChildState> emit) async {
     try {
-      await childRepository.deleteChild(event.childId, event.parentId);
-      emit(ChildLoaded(await childRepository.getChildren(event.parentId)));
+      final child = await repository.updateChild(event.child);
+      emit(ChildUpdated(child));
+      emit(ChildLoading());
+      // Após atualizar, buscar lista atualizada
+      final children = await repository.fetchChildren();
+      emit(ChildrenLoaded(children));
     } catch (e) {
-      emit(ChildError(e.toString()));
+      emit(ChildError('Failed to update child'));
     }
   }
 
-  Future<void> _onLoadChildren(
-    LoadChildrenEvent event,
-    Emitter<ChildState> emit,
-  ) async {
-    emit(ChildLoading());
+  void _onDeleteChild(DeleteChild event, Emitter<ChildState> emit) async {
     try {
-      final children = await childRepository.getChildren(event.parentId);
-      emit(ChildLoaded(children));
+      await repository.deleteChild(event.childId);
+      emit(ChildDeleted());
+      emit(ChildLoading());
+      // Após deletar, buscar lista atualizada
+      final children = await repository.fetchChildren();
+      emit(ChildrenLoaded(children));
     } catch (e) {
-      emit(ChildError(e.toString()));
+      emit(ChildError('Failed to delete child'));
     }
   }
 }

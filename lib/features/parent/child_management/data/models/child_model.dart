@@ -1,33 +1,43 @@
-class Child {
+enum Gender { male, female }
+enum Activity { speechTherapy, reading, singing }
+
+class ChildModel {
   final String id;
   final String name;
-  final int age;
-  final String gender;
+  final Gender gender;
+  final DateTime birthDate;
+  final List<Activity> availableActivities;
+  final String email;
+  final String password;
 
-  Child({
+  ChildModel({
     required this.id,
     required this.name,
-    required this.age,
     required this.gender,
+    required this.birthDate,
+    required this.availableActivities,
+    required this.email,
+    required this.password,
   });
 
-  // Convert Child object to a Map (for Firebase)
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'age': age,
-      'gender': gender,
-    };
-  }
-
-  // Create Child object from a Map (from Firebase)
-  factory Child.fromMap(Map<String, dynamic> map) {
-    return Child(
-      id: map['id'],
-      name: map['name'],
-      age: map['age'],
-      gender: map['gender'],
+  // Método de cópia para facilitar atualizações imutáveis
+  ChildModel copyWith({
+    String? id,
+    String? name,
+    Gender? gender,
+    DateTime? birthDate,
+    List<Activity>? availableActivities,
+    String? email,
+    String? password,
+  }) {
+    return ChildModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      gender: gender ?? this.gender,
+      birthDate: birthDate ?? this.birthDate,
+      availableActivities: availableActivities ?? this.availableActivities,
+      email: email ?? this.email,
+      password: password ?? this.password,
     );
   }
 }

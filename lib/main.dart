@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:voca_grow/features/parent/child_management/bloc/child_bloc.dart';
+import 'package:voca_grow/features/parent/child_management/data/repositories/child_repository.dart';
 import 'core/router/router.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'core/utils/app_theme.dart';
@@ -14,13 +16,24 @@ Future<void> main() async {
   Bloc.observer = AppBlocObserver();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
-    RepositoryProvider(
-      create: (context) => AuthRepository(),
-      child: BlocProvider(
-        lazy: false,
-        create:
-            (context) =>
-                AuthBloc(authRepository: context.read<AuthRepository>()),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (context) => AuthRepository()),
+        RepositoryProvider(create: (context) => ChildRepository()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) =>
+                    AuthBloc(authRepository: context.read<AuthRepository>()),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:(context) =>ChildBloc(repository: context.read<ChildRepository>())..add(FetchChildren()),
+          ),
+        ],
         child: const VocaGrowApp(),
       ),
     ),

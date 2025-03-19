@@ -1,48 +1,55 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/child_model.dart';
 
 class ChildRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // Simular uma lista de dados como se fosse de uma API
+  final List<ChildModel> _children = [
+    ChildModel(
+      id: '1',
+      name: 'Ahmed',
+      gender: Gender.male,
+      birthDate: DateTime(2018, 5, 15),
+      availableActivities: [Activity.speechTherapy, Activity.reading],
+      email: 'ahmed@vocagrow.com',
+      password: 'child123',
+    ),
+    ChildModel(
+      id: '2',
+      name: 'Fatima',
+      gender: Gender.female,
+      birthDate: DateTime(2019, 8, 20),
+      availableActivities: [Activity.singing, Activity.reading],
+      email: 'fatima@vocagrow.com',
+      password: 'child456',
+    ),
+  ];
 
-
-  // Add a new child
-  Future<void> addChild(Child child, String parentId) async {
-    await _firestore
-        .collection('parents')
-        .doc(parentId)
-        .collection('children')
-        .doc(child.id)
-        .set(child.toMap());
+  // Simular busca de dados
+  Future<List<ChildModel>> fetchChildren() async {
+    // Simular delay de rede
+    await Future.delayed(const Duration(milliseconds: 500));
+    return _children;
   }
 
-  // Get list of children for a parent
-  Future<List<Child>> getChildren(String parentId) async {
-    final snapshot =
-        await _firestore
-            .collection('parents')
-            .doc(parentId)
-            .collection('children')
-            .get();
-    return snapshot.docs.map((doc) => Child.fromMap(doc.data())).toList();
+  // Simular adição de criança
+  Future<ChildModel> addChild(ChildModel child) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _children.add(child);
+    return child;
   }
 
-  // Update child information
-  Future<void> updateChild(Child child, String parentId) async {
-    await _firestore
-        .collection('parents')
-        .doc(parentId)
-        .collection('children')
-        .doc(child.id)
-        .update(child.toMap());
+  // Simular atualização de criança
+  Future<ChildModel> updateChild(ChildModel child) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _children.indexWhere((c) => c.id == child.id);
+    if (index != -1) {
+      _children[index] = child;
+    }
+    return child;
   }
 
-  // Delete a child
-  Future<void> deleteChild(String childId, String parentId) async {
-    await _firestore
-        .collection('parents')
-        .doc(parentId)
-        .collection('children')
-        .doc(childId)
-        .delete();
+  // Simular remoção de criança
+  Future<void> deleteChild(String childId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _children.removeWhere((child) => child.id == childId);
   }
 }

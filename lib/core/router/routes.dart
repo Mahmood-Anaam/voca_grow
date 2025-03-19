@@ -5,6 +5,6 @@ enum AppRoute {
   resetpassword,
   parenthome,
   childhome,
-  // managechildren,
-  // childinfo, 
+  managechildren,
+  childinfo, 
   }

@@ -7,41 +7,31 @@ abstract class ChildEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class AddChildEvent extends ChildEvent {
-  final Child child;
-  final String parentId;
+class FetchChildren extends ChildEvent {}
 
-  const AddChildEvent(this.child, this.parentId);
+class AddChild extends ChildEvent {
+  final ChildModel child;
 
-  @override
-  List<Object> get props => [child, parentId];
-}
-
-class UpdateChildEvent extends ChildEvent {
-  final Child child;
-  final String parentId;
-
-  const UpdateChildEvent(this.child, this.parentId);
+  const AddChild(this.child);
 
   @override
-  List<Object> get props => [child, parentId];
+  List<Object> get props => [child];
 }
 
-class DeleteChildEvent extends ChildEvent {
+class UpdateChild extends ChildEvent {
+  final ChildModel child;
+
+  const UpdateChild(this.child);
+
+  @override
+  List<Object> get props => [child];
+}
+
+class DeleteChild extends ChildEvent {
   final String childId;
-  final String parentId;
 
-  const DeleteChildEvent(this.childId, this.parentId);
-
-  @override
-  List<Object> get props => [childId, parentId];
-}
-
-class LoadChildrenEvent extends ChildEvent {
-  final String parentId;
-
-  const LoadChildrenEvent(this.parentId);
+  const DeleteChild(this.childId);
 
   @override
-  List<Object> get props => [parentId];
+  List<Object> get props => [childId];
 }
